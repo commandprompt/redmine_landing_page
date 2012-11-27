@@ -3,25 +3,23 @@ require 'redmine'
 Redmine::Plugin.register :redmine_landing_page do
   name 'Redmine Landing Page plugin'
   author 'Igor Zubkov'
-  description 'Redmine Landing Page plugin'
-  version '0.0.2'
+  description 'Forked off https://github.com/biow0lf/redmine_landing_page'
+  version '0.2.0'
   url 'https://github.com/biow0lf/redmine_landing_page'
   author_url 'https://github.com/biow0lf'
 end
 
-require 'dispatcher'
-Dispatcher.to_prepare :redmine_contracts do
-  require_dependency 'projects_controller'
+prepare_block = Proc.new do
   ProjectsController.send(:include, RedmineLandingPage::Patches::ProjectsControllerPatch)
-
-  require_dependency 'project'
   Project.send(:include, RedmineLandingPage::Patches::ProjectPatch)
-
-  require_dependency 'principal'
   User.send(:include, RedmineLandingPage::Patches::UserPatch)
-
-  require_dependency 'welcome_controller'
   WelcomeController.send(:include, RedmineLandingPage::Patches::WelcomeControllerPatch)
+end
+
+if Rails.env.development?
+  ActionDispatch::Reloader.to_prepare { prepare_block.call }
+else
+  prepare_block.call
 end
 
 require 'redmine_landing_page/hooks/view_projects_form_hook'
