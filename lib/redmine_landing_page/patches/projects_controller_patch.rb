@@ -5,11 +5,11 @@ module RedmineLandingPage
         base.class_eval do
           unloadable
 
-          alias_method :show_without_landing_page, :show unless method_defined? :show_without_landing_page
+          alias_method :show_without_landing_page, :show
 
           def show
-            if @project.landing_page && !@project.landing_page.empty?
-              redirect_to @project.landing_page, :status => 302
+            if @project.landing_page.present?
+              redirect_to @project.landing_page
             else
               show_without_landing_page
             end

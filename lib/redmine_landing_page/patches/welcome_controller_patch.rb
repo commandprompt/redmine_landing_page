@@ -5,13 +5,12 @@ module RedmineLandingPage
         base.class_eval do
           unloadable
 
-          alias_method :index_without_landing_page, :index unless method_defined? :index_without_landing_page
+          alias_method :index_without_landing_page, :index
 
           def index
             if User.current.logged? &&
-               User.current.landing_page &&
-               !User.current.landing_page.empty?
-              redirect_to User.current.landing_page, :status => 302
+               User.current.landing_page.present?
+              redirect_to User.current.landing_page
             else
               index_without_landing_page
             end
